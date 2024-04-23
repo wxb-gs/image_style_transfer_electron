@@ -1,0 +1,30 @@
+.custom-menu {
+  padding-right: 2px;
+  position: absolute;
+  width: min-content;
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  -webkit-app-region: no-drag;
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    -webkit-app-region: drag;
+    width: 190px;
+    font-size: 14px;
+    font-weight: bold;
+    & > div {
+      height: 30px;
+    }
+  }
+  .menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    .ant-btn > span {
+      font-size: 12px;
+    }
+  }
+}
