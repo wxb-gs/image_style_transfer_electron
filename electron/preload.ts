@@ -1,14 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
-// 定义一个安全的API，用于读取本地文件
-
-contextBridge.exposeInMainWorld("fileApi", {
-  readLocalImage: async (imagePath: string) => {
-    const imageBuffer = await ipcRenderer.invoke("read-local-image", imagePath);
-    // 将Buffer转换为图片URL
-    const imageUrl = URL.createObjectURL(new Blob([imageBuffer]));
-    return imageUrl;
-  },
-});
+// contextBridge.exposeInMainWorld("fileApi", {
+//   readLocalImage: async (imagePath: string) => {
+//     const imageBuffer = await ipcRenderer.invoke("read-local-image", imagePath);
+//     // 将Buffer转换为图片URL
+//     const imageUrl = URL.createObjectURL(new Blob([imageBuffer]));
+//     return imageUrl;
+//   },
+// });
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args: Parameters<typeof ipcRenderer.on>) {

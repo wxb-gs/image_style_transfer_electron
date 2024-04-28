@@ -1,17 +1,14 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, protocol } from "electron";
+import mime from "mime";
 import { spawn } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
+import { CUSTOM_PROTOCOL, VIDEO_PROTOCOL } from "../src/constants";
 import {
-  IMAGE_PATHS_MESSAGE,
-  REQUEST_IMAGES,
-  REQUEST_STYLES,
-  STYLES_MESSAGE,
-} from "../src/constants";
-import {
-  getStyleInfo,
-  loadFolderAsBlobs,
-  readImagesFromFolder,
-} from "./funtions";
+  defineIpcHandler,
+  defineWindowControl,
+  handleVideoPath,
+} from "./ipcHandler";
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -31,10 +28,24 @@ let win: BrowserWindow | null;
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 
 let flaskProcess: any;
-const folderPath =
-  "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\content"; // 替换为你的文件夹路径
-const styleFolderPath =
-  "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\styles"; // 替换为你的文件夹路径
+
+// 注册自定义文件协议
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: CUSTOM_PROTOCOL, // 自定义协议名称
+    privileges: {
+      standard: true, // 允许标准请求
+      secure: true, // 允许安全请求
+    },
+  },
+  {
+    scheme: VIDEO_PROTOCOL,
+    privileges: {
+      standard: true, // 允许标准请求
+      secure: true, // 允许安全请求
+    },
+  },
+]);
 
 function loadFlask() {
   let pythonPath: string = "";
@@ -63,28 +74,63 @@ function loadFlask() {
   });
 }
 
-function loadNodeAPi(win: BrowserWindow) {
-  // // 异步读取文件并响应渲染器
-  // ipcMain.handle("read-local-image", async (event, imagePath) => {
-  //   try {
-  //     const imageBuffer = await fs.promises.readFile(imagePath);
-  //     return imageBuffer;
-  //   } catch (error) {
-  //     console.error("Error reading the image file:", error);
-  //     throw error;
-  //   }
-  // });
-
-  ipcMain.on(REQUEST_IMAGES, async () => {
-    const imagePaths = await readImagesFromFolder(folderPath);
-    // 将图片路径数组发送到渲染进程
-    win.webContents.send(IMAGE_PATHS_MESSAGE, imagePaths);
+function registerProtocol() {
+  protocol.handle(CUSTOM_PROTOCOL, async (request) => {
+    // 带着协议名的url，处理后返回
+    // 使用 net.fetch 获取文件内容
+    // 检查文件是否存在
+    const url = decodeURIComponent(request.url)
+      .replace(`${CUSTOM_PROTOCOL}://`, "")
+      .replace(/(.*)(#t=.*)/, "$1"); // remove "#t=*" query at the end (used in video paths)
+    // 这里小写的request.url无法直接读取访问
+    let pathToOpen = url;
+    if (!path.isAbsolute(url)) {
+      pathToOpen = pathToOpen[0] + ":" + pathToOpen.substring(1);
+    }
+    // 直接返回url不行，需要自行读取然后设置返回值类型
+    try {
+      // 读取文件内容
+      const content = fs.readFileSync(pathToOpen);
+      const mimeType = mime.getType(pathToOpen); // 根据文件路径获取MIME类型
+      return new Response(content, {
+        headers: { "Content-Type": mimeType! },
+      });
+    } catch (error) {
+      console.error("Failed to load image:", error);
+      return new Response("Error loading image", { status: 404 });
+    }
   });
 
-  ipcMain.on(REQUEST_STYLES, async () => {
-    const styleInfo = await getStyleInfo(styleFolderPath);
-    // 将图片路径数组发送到渲染进程
-    win.webContents.send(STYLES_MESSAGE, styleInfo);
+  protocol.handle(VIDEO_PROTOCOL, async (request) => {
+    let url = request.url;
+    url = url.replace(/^video:\/\//, "");
+    if (url[url.length - 1] == "/") {
+      url = url.substring(0, url.length - 1);
+    }
+    let videoFileName = url;
+    const absolutePath = path.join(
+      "E:\\myAllProjects\\vue\\electron-vite-project\\dist-electron\\data",
+      videoFileName
+    );
+    try {
+      // 读取视频文件为二进制数据
+      const videoData = await fs.promises.readFile(absolutePath);
+      // 设置正确的MIME类型，这里以 'video/mp4' 为例
+      const mimeType = "video/mp4";
+      // 返回包含视频数据和MIME类型的响应
+      return new Response(videoData, {
+        headers: {
+          "Content-Type": mimeType,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to load video:", error);
+      // 如果发生错误，返回一个错误响应
+      return new Response("Error loading video file", {
+        status: 404,
+        statusText: "Not Found",
+      });
+    }
   });
 }
 
@@ -92,20 +138,13 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 650,
+    minHeight: 450,
+    minWidth: 650,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
-    // frame: false,
-    // titleBarStyle: "hidden",
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "white",
-      symbolColor: "blue",
-      height: 40,
-    },
-    // transparent: true,
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      webSecurity: false,
-      // contextIsolation: false,
+      //   webSecurity: false,
     },
   });
 
@@ -114,15 +153,18 @@ function createWindow() {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
   });
 
+  registerProtocol();
+  // loadFlask();
+  defineIpcHandler(win);
+  defineWindowControl(win);
+  handleVideoPath(win);
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(process.env.DIST, "index.html"));
   }
-
-  loadFlask();
-  loadNodeAPi(win);
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common

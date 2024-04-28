@@ -1,0 +1,92 @@
+//设置顶层tabs以及侧边栏和content
+.ant-tabs-top > .ant-tabs-nav,
+:where(.css-dev-only-do-not-override-1qfezbu).ant-tabs-bottom > .ant-tabs-nav,
+:where(.css-dev-only-do-not-override-1qfezbu).ant-tabs-top
+  > div
+  > .ant-tabs-nav,
+:where(.css-dev-only-do-not-override-1qfezbu).ant-tabs-bottom
+  > div
+  > .ant-tabs-nav {
+  margin: 0;
+}
+
+.ant-tabs {
+  background-color: white;
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  /* 发现左右两侧溢出了很多 */
+  /* overflow: auto; */
+  border-radius: 10px;
+}
+.ant-tabs .ant-tabs-content-holder {
+  /* 占据剩下的 */
+  flex: 1;
+}
+
+.ant-tabs .ant-tabs-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.ant-tabs-content {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  /* overflow: auto; */
+}
+.ant-layout-content {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.ant-tabs .ant-tabs-tabpane {
+  height: 100%;
+  width: 100%;
+}
+
+.ant-layout .ant-layout-sider-trigger {
+  background-color: #ededed !important;
+}
+
+/* 设置该区域可拖拽 */
+.ant-tabs > .ant-tabs-nav .ant-tabs-nav-wrap .ant-tabs-nav-list {
+  -webkit-app-region: no-drag;
+  background-color: #ededed;
+}
+
+.top-area {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  -webkit-app-region: drag;
+  z-index: -100;
+}
+
+// 定义伸缩面板bar
+.top-bar,
+.left-bar {
+  background-color: transparent;
+  transition: opacity 0.5s; /* 添加淡入效果的过渡动画 */
+  opacity: 0; /* 默认情况下设置透明度为 0 */
+  &:hover,
+  &:active {
+    opacity: 1; /* 鼠标悬停时设置透明度为 1，显示 resize-bar */
+    background-color: rgb(176, 176, 253);
+  }
+}
+.top-bar {
+  transform: translateY(-5px);
+  height: 5px !important;
+}
+.left-bar {
+  transform: translateX(10px);
+  width: 5px !important;
+}

@@ -27,4 +27,23 @@
       font-size: 12px;
     }
   }
+  .controls {
+    -webkit-app-region: no-drag;
+    position: fixed;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    // width: 120px;
+    font-size: 20px;
+    z-index: 1000;
+    .anticon {
+      height: 100%;
+      display: inline-block;
+      padding: 5px 10px;
+      color: blue;
+      &:hover {
+        background-color: #f2f2f2;
+      }
+    }
+  }
 }

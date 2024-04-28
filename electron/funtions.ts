@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { CUSTOM_PROTOCOL } from "../src/constants";
 
 const IMAGE_TYPES = [".jpg", ".jpeg", ".png", ".gif"];
 
@@ -42,7 +43,6 @@ async function readImagesFromFolder(folderPath: string) {
     // 获取图片文件的完整路径
     const imagePaths = imageFiles.map((file) => path.join(folderPath, file));
     // 返回图片文件路径的数组
-    // 需要转化为blob url进行使用
     return imagePaths;
   } catch (error) {
     console.error("读取图片时发生错误:", error);
@@ -59,9 +59,9 @@ async function getStyleInfo(styleFolder: string) {
   const paths = await readImagesFromFolder(styleFolder);
   const styleInfo = paths!.map((item) => {
     const file = path.parse(item);
-    // const blobUrl = loadImageAsBlob(item);
     return {
       path: item,
+      //   name: `${CUSTOM_PROTOCOL}://${file.name}`,
       name: file.name,
     };
   });

@@ -1,0 +1,2 @@
+export const DRAGGABLE_BORDER_WIDTH = 4;
+export const INITIAL_SIDERBAE_WIDTH = 4;

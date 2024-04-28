@@ -11,10 +11,15 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
     "antd": "^5.16.2",
+    "dplayer": "^1.27.1",
+    "framer-motion": "^11.1.7",
     "keepalive-for-react": "^2.0.6",
+    "mime": "^4.0.1",
     "nanoid": "^5.0.7",
+    "re-resizable": "^6.9.14",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
     "react-filerobot-image-editor": "^4.7.1",
     "react-router-dom": "^6.22.3",
     "react-svg": "^16.1.34",
@@ -22,6 +27,7 @@
   },
   "devDependencies": {
     "@originjs/vite-plugin-global-style": "^1.0.3",
+    "@types/dplayer": "^1.25.5",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
@@ -37,6 +43,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.2.2",
+    "video.js": "^8.10.0",
     "vite": "^5.1.6",
     "vite-plugin-electron": "^0.28.4",
     "vite-plugin-electron-renderer": "^0.14.5"

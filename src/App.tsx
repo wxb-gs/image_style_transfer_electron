@@ -1,15 +1,15 @@
 import { Tabs, TabsProps } from "antd";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import "./App.css";
+import "./App.less";
 import CustomMenu from "./components/other/CustomMenu";
-import Example from "./views/Example";
+import Editor from "./views/Editor/index";
 import Home from "./views/Home";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 const initialItems = [
   { label: "主页", children: <Home />, key: "1", closable: false },
-  { label: "Tab 2", children: <Example />, key: "2" },
+  { label: "Tab 2", children: <Editor />, key: "2" },
 ];
 
 const App: React.FC = () => {
@@ -76,10 +76,9 @@ const App: React.FC = () => {
   const renderTabBar: TabsProps["renderTabBar"] = (props, DefaultTabBar) => (
     <DefaultTabBar
       {...props}
-      style={{ marginLeft: menuWidth + "px" }}
+      style={{ left: menuWidth + "px" }}
     />
   );
-  console.log(menuWidth);
 
   return (
     <>
@@ -88,6 +87,7 @@ const App: React.FC = () => {
       <Tabs
         type="editable-card"
         renderTabBar={renderTabBar}
+        animated={{ inkBar: true, tabPane: true }}
         onChange={onChange}
         activeKey={activeKey}
         onEdit={onEdit}
@@ -97,4 +97,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default React.memo(App);

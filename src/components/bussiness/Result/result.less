@@ -1,0 +1,66 @@
+.cover-bar {
+  display: flex;
+  background-color: rgb(176, 176, 253);
+  width: 5px !important;
+  justify-content: center;
+  position: relative;
+  &::before {
+    bottom: 20%;
+    position: absolute;
+    content: url("@/assets/code.svg"); /* 设置图标的路径 */
+    border-radius: 50%;
+    background-color: rgb(176, 176, 253);
+    // font-size: 20px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    width: 30px; /* 图标的宽度 */
+    height: 30px; /* 图标的高度 */
+  }
+}
+.transfer-result {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  position: relative;
+  overflow: auto;
+  img {
+    border-radius: 4px;
+    max-height: 400px;
+  }
+  //   .result-container {
+  //     height: 400px;
+  //     width: 400px;
+  //     .source-container {
+  //       .source-img {
+  //         position: absolute;
+  //         z-index: 2;
+  //         height: 100%;
+  //         width: 400px;
+  //         border-radius: 4px;
+  //       }
+  //     }
+  //     .transfer-cover {
+  //       border-radius: 4px;
+  //       z-index: 2;
+  //       top: 0;
+  //       left: 0;
+  //       position: absolute !important;
+  //       width: 400px;
+  //       & > div {
+  //         width: 400px;
+  //         overflow: hidden;
+  //         z-index: 2;
+  //         img {
+  //           z-index: 0 !important;
+  //           max-width: none;
+  //           position: absolute;
+  //           width: 400px !important;
+  //         }
+  //       }
+  //     }
+  //   }
+}
+.transfer-histories {
+  //
+}

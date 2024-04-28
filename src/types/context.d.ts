@@ -5,6 +5,7 @@ interface Action {
 
 interface State {
   id: string;
+  styles: string[];
 }
 
 interface Message {
