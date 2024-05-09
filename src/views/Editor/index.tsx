@@ -1,6 +1,6 @@
 import ImageEditor from "@/components/bussiness/ImageEditor";
 import VideoEditor from "@/components/bussiness/VideoEditor";
-import { LIMIT_VIDEO } from "@/constants";
+import { LIMIT_CAMERA, LIMIT_VIDEO, LIMIT_IMAGE } from "@/constants";
 import { useEditorStore } from "@/hooks/useEditorStore";
 import { sendMessage, sendTransfer, socket } from "@/requests/socket";
 import { getFileType } from "@/utils/pathUtils";
@@ -27,7 +27,6 @@ const Editor = () => {
     source,
     loading,
     styles,
-    progress,
     setProgress,
     setResVideo,
     setLoading,
@@ -43,6 +42,7 @@ const Editor = () => {
     const type = getFileType(source);
     if (type) {
       if (LIMIT_VIDEO.includes(type)) return "video";
+      else if (LIMIT_CAMERA == type) return "camera";
     }
     return "image";
   }, [source]);
