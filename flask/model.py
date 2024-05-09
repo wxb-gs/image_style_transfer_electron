@@ -143,7 +143,6 @@ class Model:
                     output = self.style_transfer( content, style,alpha)
                 return self.__processImage__(output)
 
-
     #处理过程
     def process(self,options):
         if not isinstance(options,dict):
@@ -206,7 +205,6 @@ class Model:
                     with torch.no_grad():
                         output = self.style_transfer( content, style,alpha)
                     return self.__processImage__(output)
-
 
     def __processImage__(self,output):
         output = output.cpu()
@@ -302,7 +300,6 @@ class Model:
         pbar.close()
         
         return  os.path.abspath(output_video_path)
-
 
     def processData(self,data,options):
         if not isinstance(options,dict):

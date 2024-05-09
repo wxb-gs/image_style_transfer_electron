@@ -26,7 +26,7 @@ release
 *.sw?
 
 #python
-flask__pycache__
+flask/__pycache__
 flask/models
 flask/input/output/*
 flask/input/video/*
