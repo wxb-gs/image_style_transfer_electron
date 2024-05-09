@@ -28,4 +28,5 @@ release
 #python
 __pycache__
 models
-output
+input/output
+input/video
