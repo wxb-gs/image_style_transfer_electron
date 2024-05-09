@@ -24,5 +24,7 @@ const disconnect = () => {
 const sendMessage = (msg: Message) => {
   socket.emit("message", msg);
 };
-
-export { socket, connect, disconnect, sendMessage };
+const sendTransfer = (msg: any) => {
+  socket.emit("transfer", msg);
+};
+export { socket, connect, disconnect, sendMessage, sendTransfer };

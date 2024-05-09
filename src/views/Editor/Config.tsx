@@ -5,13 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import KeepAlive, { useKeepaliveRef } from "keepalive-for-react";
 import React, { useMemo, useState } from "react";
 import "./config.less";
+import Args from "@/components/bussiness/Args";
 type Option = {
   label: string;
   cache: boolean;
   component: React.FC;
 };
-
-const text = () => <p>123</p>;
 
 const OPTIONS: Option[] = [
   { label: "结果", cache: true, component: Result },
@@ -20,7 +19,7 @@ const OPTIONS: Option[] = [
     cache: true,
     component: SelectStyle,
   },
-  { label: "自定义参数", cache: true, component: text },
+  { label: "设置", cache: true, component: Args },
 ];
 
 const Config: React.FC = () => {

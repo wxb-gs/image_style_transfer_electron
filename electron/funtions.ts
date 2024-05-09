@@ -1,7 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { CUSTOM_PROTOCOL } from "../src/constants";
-
 const IMAGE_TYPES = [".jpg", ".jpeg", ".png", ".gif"];
 
 async function loadImageAsBlob(imagePath: string): Promise<string | null> {
@@ -68,4 +66,4 @@ async function getStyleInfo(styleFolder: string) {
   return styleInfo;
 }
 
-export { readImagesFromFolder, getStyleInfo, loadFolderAsBlobs };
+export { getStyleInfo, loadFolderAsBlobs, readImagesFromFolder };

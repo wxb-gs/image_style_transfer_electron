@@ -6,10 +6,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
+  .active {
+    p {
+      color: black !important;
+    }
+    img {
+      border: 5px solid blueviolet;
+    }
+    .mask {
+      display: none;
+    }
+  }
   .img-container {
     border-radius: 4px;
-    // height: 180px;
-    // width: 180px;
     border: 1px solid #e1e1e1;
     display: flex;
     align-items: center;
@@ -18,13 +27,57 @@
       margin-top: 3px;
       font-size: 15px;
       font-weight: 500;
+      color: rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease-out;
+      &:hover {
+        transform: scale(1.1);
+        color: blue;
+      }
+      &:active {
+        color: red;
+      }
     }
-    img {
-      border-radius: 5px;
-      display: block;
+    .style-content {
       margin: 10px 0;
-      height: 150px;
-      width: 150px;
+      border-radius: 5px;
+      position: relative;
+      //   height: 150px;
+      //   width: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        height: 145px;
+        width: 145px;
+        border-radius: 5px;
+        display: block;
+        user-drag: none; /* 禁止拖拽 */
+        -moz-user-select: none; /* Firefox */
+        -webkit-user-drag: none; /* Safari */
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE/Edge */
+        user-select: none; /* 其他浏览器 */
+        // mask: linear-gradient(to right, transparent 50%, black 50%);
+      }
+      .mask {
+        background-color: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+      .resize-mask {
+        top: 0px;
+        position: absolute !important;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .right-slider {
+        position: absolute;
+      }
     }
   }
+}
+.my-topBar {
+  transform: translateY(-4px);
+  height: 5px !important;
+  background-color: white;
 }

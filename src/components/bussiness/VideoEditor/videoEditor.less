@@ -1,0 +1,33 @@
+.video-editor {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  .ant-card-head {
+    max-height: 65px;
+    height: 65px;
+  }
+  .ant-card-body {
+    // height: 100%;
+    flex: 1;
+    overflow: auto;
+    #my-video-editor {
+      height: 100%;
+      width: 100%;
+      .video-container {
+        height: 100%;
+        margin-top: 76px;
+        .video-wrap {
+          // margin-bottom: 5px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          #video-preview {
+            transform: none !important;
+            max-width: 90% !important;
+          }
+        }
+      }
+    }
+  }
+}

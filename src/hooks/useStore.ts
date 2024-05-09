@@ -1,9 +1,6 @@
-import { Dispatch, useContext } from "react";
-import {AppContext} from '@/context'
-type ContextState=State&{
-    dispatch:Dispatch<Action>
-}
-const useStore = ()=>{
- return useContext(AppContext) as ContextState
-}
-export {useStore}
+import { AppContext } from "@/context";
+import { useContext } from "react";
+const useStore = () => {
+  return useContext(AppContext) as ContextState;
+};
+export { useStore };

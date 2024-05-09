@@ -1,7 +1,10 @@
-from flask import Flask
-from flask_socketio import SocketIO,send
+import threading
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit 
+
+from flask import Flask
 from model import Model
+from threading import Thread
 
 #上来就加载模型
 useModel = Model()
@@ -25,20 +28,77 @@ def handle_connect():
 #weights
 @socketio.on('message')
 def handle_message(msg):
-    useModel.process({
-         'content_paths':['./input/content/chicago.jpg'],
-         'style_paths':['./input/styles/antimonocromatismo.jpg','./input/styles/contrast_of_forms.jpg']
+    content_paths=msg['content_paths']
+    style_paths=msg['style_paths']
+    weights = msg['weights']
+    alpha=msg['alpha']
+    # preserve_color=msg['preserve_color']
+    print(style_paths)
+    print(weights)
+    print(alpha)
+    do_interpolation = False
+    if len(style_paths) > 1:
+        do_interpolation = True
+
+    result = useModel.process({
+         'content_paths':content_paths,
+         'style_paths':style_paths,
+         'do_interpolation': do_interpolation,
+         'alpha':alpha,
+         'weights':weights
     })
-    print('Received message: ' + str(msg))
-    # send('message',json=True)
+    emit('transfer-over',{
+        'filePath':result
+    })
     # 这里可以添加对消息的处理逻辑
+
+
+@socketio.on('transfer')
+def handle_transfer(msg):
+    def emit_progress(now,total):
+        # print('emit-progress')
+        socketio.emit('progress',{
+            'now':now,
+            'total':total
+        })
+        socketio.sleep(0)
+
+    content_video=msg['content_video']
+    style_paths=msg['style_paths']
+    weights = msg['weights']
+    alpha=msg['alpha']
+    do_interpolation = False
+    if len(style_paths) > 1:
+        do_interpolation = True
+    result = useModel.processVideo({
+        'content_video':content_video,
+        'style_paths':style_paths,
+        'weights':weights,
+        'alpha':alpha,
+        'do_interpolation':do_interpolation
+    },emit_progress)
+    print(result)
+    emit('transfer-video-over',{
+        'filePath':result
+    })
+  
+@socketio.on('video_frame')
+def on_video_frame(data):
+    # def process_data(data):
+    # 这里是处理数据的逻辑
+    newData = useModel.processData(data, {})
+    # 通过 SocketIO 发送处理后的数据
+    socketio.sleep(0)
+    socketio.emit('processed_frame', newData)
+    print('发送')
+
+    # 使用 start_background_task 在后台处理数据
+    # socketio.start_background_task(target=process_data, data=data)
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected')
-
-
 
 
 

@@ -1,6 +1,6 @@
 import { AppProvider } from "@/context";
 import type { ReactNode } from "react";
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import LoadingPage from "./components/other/LoadingPage";
 import "./index.css";
@@ -12,13 +12,13 @@ const AppWrapper = ({ children }: { children: ReactNode }) => (
 
 const Main = () => {
   return (
-    <React.StrictMode>
-      <AppWrapper>
-        <AppProvider>
-          <App />
-        </AppProvider>
-      </AppWrapper>
-    </React.StrictMode>
+    // <React.StrictMode>
+    <AppWrapper>
+      <AppProvider>
+        <App />
+      </AppProvider>
+    </AppWrapper>
+    // </React.StrictMode>
   );
 };
 

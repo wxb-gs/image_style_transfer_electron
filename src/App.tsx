@@ -1,23 +1,19 @@
+import { useStore } from "@/hooks/useStore";
 import { Tabs, TabsProps } from "antd";
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { SET_TABS } from "./actions/setTabs";
 import "./App.less";
 import CustomMenu from "./components/other/CustomMenu";
-import Editor from "./views/Editor/index";
-import Home from "./views/Home";
+import { OPEN_FILE_DIALOG, SELECT_FILE_MESSAGE } from "./constants";
+import requestAndProcessMessage from "./utils/requestAndProcessMessage";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
-const initialItems = [
-  { label: "主页", children: <Home />, key: "1", closable: false },
-  { label: "Tab 2", children: <Editor />, key: "2" },
-];
-
 const App: React.FC = () => {
-  const [activeKey, setActiveKey] = useState(initialItems[0].key);
-  const [items, setItems] = useState(initialItems);
+  const { tabs, dispatch, addTab } = useStore();
+  const { items, activeKey } = tabs;
   const [menuWidth, setMenuWidth] = useState(200);
   const menuRef = useRef<HTMLDivElement>(null);
-  const newTabIndex = useRef(0);
 
   useLayoutEffect(() => {
     if (menuRef.current) {
@@ -27,19 +23,24 @@ const App: React.FC = () => {
   }, []);
 
   const onChange = (newActiveKey: string) => {
-    setActiveKey(newActiveKey);
+    dispatch({
+      type: SET_TABS,
+      payload: {
+        activeKey: newActiveKey,
+      },
+    });
   };
 
   const add = () => {
-    const newActiveKey = `newTab${newTabIndex.current++}`;
-    const newPanes = [...items];
-    newPanes.push({
-      label: "New Tab",
-      children: "Content of new Tab",
-      key: newActiveKey,
-    });
-    setItems(newPanes);
-    setActiveKey(newActiveKey);
+    requestAndProcessMessage(
+      OPEN_FILE_DIALOG,
+      SELECT_FILE_MESSAGE,
+      null,
+      (result) => {
+        // 判断文件
+        addTab(result, result);
+      }
+    );
   };
 
   const remove = (targetKey: TargetKey) => {
@@ -58,8 +59,13 @@ const App: React.FC = () => {
         newActiveKey = newPanes[0].key;
       }
     }
-    setItems(newPanes);
-    setActiveKey(newActiveKey);
+    dispatch({
+      type: SET_TABS,
+      payload: {
+        items: newPanes,
+        activeKey: newActiveKey,
+      },
+    });
   };
 
   const onEdit = (

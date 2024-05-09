@@ -1,14 +1,22 @@
+import { CUSTOM_PROTOCOL, TRANSLATIONS } from "@/constants";
+import React, { forwardRef } from "react";
 import FilerobotImageEditor, {
   TABS,
   TOOLS,
 } from "react-filerobot-image-editor";
-import { TRANSLATIONS } from "@/constants";
-const ImageEditor = () => {
+type Props = {
+  source: string | undefined;
+};
+const ImageEditor = forwardRef<any, Props>(({ source }, ref) => {
   return (
     <FilerobotImageEditor
-      // useBackendTranslations={false}
+      getCurrentImgDataFnRef={ref}
       translations={TRANSLATIONS}
-      source="custom:E:\myAllProjects\vue\electron-vite-project\src\assets\styles\impronte_d_artista.jpg"
+      source={
+        source
+          ? `${CUSTOM_PROTOCOL}:${source}`
+          : "custom:E:\\myAllProjects\\vue\\electron-vite-project\\src\\assets\\styles\\impronte_d_artista.jpg"
+      }
       onSave={(editedImageObject, designState) =>
         console.log("saved", editedImageObject, designState)
       }
@@ -64,11 +72,11 @@ const ImageEditor = () => {
         TABS.FILTERS,
         TABS.FINETUNE,
         TABS.RESIZE,
-      ]} // or {['Adjust', 'Annotate', 'Watermark']}
+      ]}
       defaultTabId={TABS.ADJUST}
       defaultToolId={TOOLS.CROP}
     />
   );
-};
+});
 
-export default ImageEditor;
+export default React.memo(ImageEditor);

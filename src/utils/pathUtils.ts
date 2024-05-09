@@ -49,4 +49,12 @@ const processResults = (results: string[]) => {
   });
 };
 
-export { getSafePath, processResults };
+const getFileType = (filePath: string | undefined) => {
+  if (filePath) {
+    let index = filePath.indexOf(".");
+    const type = filePath.substring(index + 1);
+    return type;
+  }
+};
+
+export { getSafePath, processResults, getFileType };

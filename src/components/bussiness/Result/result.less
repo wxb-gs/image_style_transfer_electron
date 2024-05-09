@@ -23,44 +23,27 @@
   flex: 1;
   justify-content: center;
   position: relative;
+  align-items: center;
   overflow: auto;
+  video {
+    height: 100%;
+    width: auto;
+  }
+  .none {
+    display: none;
+  }
   img {
     border-radius: 4px;
     max-height: 400px;
   }
-  //   .result-container {
-  //     height: 400px;
-  //     width: 400px;
-  //     .source-container {
-  //       .source-img {
-  //         position: absolute;
-  //         z-index: 2;
-  //         height: 100%;
-  //         width: 400px;
-  //         border-radius: 4px;
-  //       }
-  //     }
-  //     .transfer-cover {
-  //       border-radius: 4px;
-  //       z-index: 2;
-  //       top: 0;
-  //       left: 0;
-  //       position: absolute !important;
-  //       width: 400px;
-  //       & > div {
-  //         width: 400px;
-  //         overflow: hidden;
-  //         z-index: 2;
-  //         img {
-  //           z-index: 0 !important;
-  //           max-width: none;
-  //           position: absolute;
-  //           width: 400px !important;
-  //         }
-  //       }
-  //     }
-  //   }
+  min-height: 300px;
 }
 .transfer-histories {
-  //
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  & > div {
+    margin-right: 20px;
+    margin-bottom: 10px;
+  }
 }
