@@ -62,7 +62,8 @@ def handle_transfer(msg):
             'total':total
         })
         socketio.sleep(0)
-
+    in_time = msg['in']
+    out_time = msg['out']
     content_video=msg['content_video']
     style_paths=msg['style_paths']
     weights = msg['weights']
@@ -75,7 +76,11 @@ def handle_transfer(msg):
         'style_paths':style_paths,
         'weights':weights,
         'alpha':alpha,
-        'do_interpolation':do_interpolation
+        'do_interpolation':do_interpolation,
+        'time':{
+            'in':in_time,
+            'out':out_time
+        }
     },emit_progress)
     print(result)
     emit('transfer-video-over',{

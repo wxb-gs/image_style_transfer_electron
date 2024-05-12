@@ -21,6 +21,7 @@ import React, {
 } from "react";
 import Config from "./Config";
 import "./editor.less";
+import Camera from "@/components/bussiness/Camera";
 
 const Editor = () => {
   const {
@@ -36,6 +37,7 @@ const Editor = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [notificationApi, noteContextHolder] = notification.useNotification();
   const imageRef = useRef();
+  const videoRef = useRef<any>(null);
   const [hiddenTransfer, setHiddenTransfer] = useState(false);
   const isFirst = useRef(false);
   const fileType = useMemo(() => {
@@ -127,6 +129,29 @@ const Editor = () => {
       setHiddenTransfer(false);
     }
   };
+  // 视频转换流程
+  const videoTransfer = (transform: any, videoSrc: any) => {
+    console.log(transform, videoSrc);
+    const { time } = transform;
+    sendTransfer({
+      content_video: source,
+      style_paths: styles.map((item) => item.path),
+      alpha: styles[0].weight,
+      weights: styles.map((item) => item.weight),
+      in: time.in,
+      out: time.out,
+    });
+    openNotification();
+    setTimeout(() => {
+      setLoading((state: boolean) => {
+        if (state) {
+          messageApi.error("超时出错,未转化成功");
+          return false;
+        }
+        return state;
+      });
+    }, 3 * 60 * 1000);
+  };
 
   //开始转换方法
   const startTransfer = () => {
@@ -152,24 +177,16 @@ const Editor = () => {
       const imageBase64 = imageData.imageBase64;
       window.ipcRenderer.send("transfer", imageBase64);
     } else if (fileType == "video") {
-      sendTransfer({
-        content_video: source,
-        style_paths: styles.map((item) => item.path),
-        alpha: styles[0].weight,
-        weights: styles.map((item) => item.weight),
-      });
-      openNotification();
-      setTimeout(() => {
-        setLoading((state: boolean) => {
-          if (state) {
-            messageApi.error("超时出错,未转化成功");
-            return false;
-          }
-          return state;
-        });
-      }, 3 * 60 * 1000);
+      // 触发save，在save中写逻辑
+      videoRef.current.clickSave();
     }
   };
+
+  // transform,videoSrc
+  const onSave = (transform: any, videoSrc: any) => {
+    videoTransfer(transform, videoSrc);
+  };
+
   return (
     <>
       {contextHolder}
@@ -191,14 +208,20 @@ const Editor = () => {
             }
           />
         </FloatButton.Group>
-        {fileType == "image" ? (
+        {fileType == "image" && (
           <ImageEditor
             ref={imageRef}
             source={source}
           />
-        ) : (
-          <VideoEditor source={source} />
         )}
+        {fileType == "video" && (
+          <VideoEditor
+            ref={videoRef}
+            onSave={onSave}
+            source={source}
+          />
+        )}
+        {fileType == "camera" && <Camera />}
         <Resizable
           enable={{ left: true }}
           handleClasses={{ left: "left-bar" }}
@@ -212,7 +235,7 @@ const Editor = () => {
           ].join(" ")}>
           <Card
             className="right-config"
-            title="AI风格转换"
+            title="风格转换"
             bordered={false}
             extra={
               <Button

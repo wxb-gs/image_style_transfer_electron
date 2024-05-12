@@ -1,10 +1,11 @@
 import { useEditorStore } from "@/hooks/useEditorStore";
 import { useStore } from "@/hooks/useStore";
 import { getSafePath } from "@/utils/pathUtils";
-import { Tooltip } from "antd";
+import { Collapse, CollapseProps, Tooltip, theme } from "antd";
 import { Resizable } from "re-resizable";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useCallback, CSSProperties } from "react";
 import "./selectStyle.less";
+import { CaretRightOutlined } from "@ant-design/icons";
 const DEFAULT_MAX_HEIGHT = 140;
 const DEAULT_MIN_HEIGHT = 2;
 const StyleImage = ({ name, path, selectedMap, handleClick }: any) => {
@@ -68,6 +69,7 @@ const StyleImage = ({ name, path, selectedMap, handleClick }: any) => {
 
 const SelectStyle = () => {
   const { styles } = useStore();
+  const { token } = theme.useToken();
   const { styles: selectStyles, setStyles: setSelectStyles } = useEditorStore();
   const selectedMap = useMemo(() => {
     const map = new Map();
@@ -76,6 +78,43 @@ const SelectStyle = () => {
     });
     return map;
   }, [selectStyles]);
+  const panelStyle: React.CSSProperties = {
+    marginBottom: 24,
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    border: "none",
+  };
+  const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] =
+    useCallback(
+      (panelStyle) => [
+        {
+          key: "1",
+          label: "预定义",
+          children: (
+            <div className="style-imgs">
+              {styles.map(({ name, path }: any) => (
+                <StyleImage
+                  name={name}
+                  path={path}
+                  key={path}
+                  selectedMap={selectedMap}
+                  handleClick={handleClick}
+                />
+              ))}
+            </div>
+          ),
+          style: panelStyle,
+        },
+        {
+          key: "2",
+          label: "自定义",
+          children: <div></div>,
+          style: panelStyle,
+        },
+      ],
+      [styles, selectedMap]
+    );
+
   const handleClick = (keyName: string) => {
     const { path }: any = styles.find((item: any) => item.name == keyName);
 
@@ -91,18 +130,17 @@ const SelectStyle = () => {
       setSelectStyles(newSelectStyles);
     }
   };
+
   return (
-    <div className="style-imgs">
-      {styles.map(({ name, path }: any) => (
-        <StyleImage
-          name={name}
-          path={path}
-          key={path}
-          selectedMap={selectedMap}
-          handleClick={handleClick}
-        />
-      ))}
-    </div>
+    <Collapse
+      bordered={false}
+      defaultActiveKey={["1"]}
+      expandIcon={({ isActive }) => (
+        <CaretRightOutlined rotate={isActive ? 90 : 0} />
+      )}
+      style={{ marginTop: "10px" }}
+      items={getItems(panelStyle)}
+    />
   );
 };
 

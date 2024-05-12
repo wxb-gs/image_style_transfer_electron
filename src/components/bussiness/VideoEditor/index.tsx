@@ -1,15 +1,17 @@
 import Video from "./VideoEditor.js";
 import "./videoEditor.less";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Card } from "antd";
 
 type Props = {
   source: string | undefined;
+  onSave: Function;
 };
-const VideoEditor = ({ source }: Props) => {
+const VideoEditor = forwardRef(({ source, onSave }: Props, ref) => {
   const videoEditorRef = useRef<any>(null);
   const videoDivRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    document.getElementsByClassName("save-button")[0];
     window.ipcRenderer.send("get_video", source);
     window.ipcRenderer.on("video-buffer", (_e, { videoBuffer }) => {
       const blob = new Blob([videoBuffer], { type: "video/mp4" });
@@ -20,19 +22,30 @@ const VideoEditor = ({ source }: Props) => {
         transformations: {
           time: { in: 0, out: 2 },
         },
-        onSave: (transform, videoSrc) => {
+        onSave: (transform: any, videoSrc: any) => {
           // do something with the transformed video
           console.log("Saved!", transform, videoSrc);
+          onSave(transform, videoSrc);
         },
       };
       videoEditorRef.current = new Video(options);
-      //   const domRef = document.getElementById("my-video-editor");
-      //   console.log(domRef);
-      console.log("render video");
       videoEditorRef.current.render(videoDivRef.current);
     });
   }, []);
-
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        clickSave: () => {
+          const btn: HTMLButtonElement = document.getElementsByClassName(
+            "save-button"
+          )[0] as any;
+          btn.click();
+        },
+      };
+    },
+    []
+  );
   return (
     <Card
       title="视频预览"
@@ -42,6 +55,6 @@ const VideoEditor = ({ source }: Props) => {
         ref={videoDivRef}></div>
     </Card>
   );
-};
+});
 
 export default VideoEditor;

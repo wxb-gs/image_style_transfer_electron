@@ -55,15 +55,16 @@ function defineIpcHandler(win: BrowserWindow, db: Low<Data>) {
       ],
     });
     if (file) {
-      // 将选择的文件路径发送回渲染器进程
       //   写入recent中
       const absolutePath = path.parse(file[0]);
       const time = dayjs();
       db.data.recent = [
         {
+          key: absolutePath.name,
           url: file[0],
           name: absolutePath.name,
           time: time.format("MM/DD HH:mm"),
+          transfer: [],
         },
         ...db.data.recent,
       ];
@@ -75,6 +76,7 @@ function defineIpcHandler(win: BrowserWindow, db: Low<Data>) {
   });
 }
 
+// lowdb读取相关
 function lowdbHandler(win: BrowserWindow, db: Low<Data>) {
   ipcMain.on(REQUEST_RECENT, async (_e, key = "recent") => {
     const recentData = getValue(db, key);
@@ -127,6 +129,7 @@ function lowdbHandler(win: BrowserWindow, db: Low<Data>) {
   });
 }
 
+// 窗口最大、最小化
 function defineWindowControl(win: BrowserWindow) {
   ipcMain.on(MINIMIZW_WINDOW, () => {
     win.minimize();
@@ -150,6 +153,7 @@ function defineWindowControl(win: BrowserWindow) {
   });
 }
 
+// 读取视频
 function handleVideoPath(win: BrowserWindow) {
   ipcMain.on("get_video", (_e, pathName: string) => {
     let absolutePath;

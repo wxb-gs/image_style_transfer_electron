@@ -14,7 +14,7 @@ import cv2
 from tqdm import tqdm
 import numpy as np
 import imageio
-
+from moviepy.editor import VideoFileClip
 
 
 decoder_model_path = './models/decoder_iter_160000.pth.tar'
@@ -230,6 +230,13 @@ class Model:
         weights= options.get('weights',[])
         save_ext = options.get('save_ext','.mp4')
         interpolation_weights = None
+        time = options.get('time',{
+            'in':1,
+            'out':2
+        })
+        in_time = time.get('in')
+        out_time = time.get('out')
+
 
         #有多个风格则处理
         if do_interpolation: 
@@ -242,8 +249,16 @@ class Model:
 
         device = self.device
         
+        video = VideoFileClip(content_video)
 
-        content_video = cv2.VideoCapture(content_video)
+        # 剪辑视频
+        edited_video = video.subclip(in_time, out_time)
+
+        # 将剪辑后的视频写入文件
+        edited_video.write_videofile('./input/temp.mp4')
+
+        content_video = cv2.VideoCapture('./input/temp.mp4')
+        
         fps = int(content_video.get(cv2.CAP_PROP_FPS))
         content_video_length = int(content_video.get(cv2.CAP_PROP_FRAME_COUNT))
         output_width = int(content_video.get(cv2.CAP_PROP_FRAME_WIDTH))
