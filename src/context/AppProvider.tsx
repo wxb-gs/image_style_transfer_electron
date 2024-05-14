@@ -1,12 +1,7 @@
 import { ReactNode, useCallback, useEffect, useMemo } from "react";
 
 import { SET_TABS } from "@/actions/setTabs";
-import {
-  RECENT_MESSAGE,
-  REQUEST_RECENT,
-  REQUEST_STYLES,
-  STYLES_MESSAGE,
-} from "@/constants";
+import { RECENT_MESSAGE, REQUEST_RECENT } from "@/constants";
 import { connect, disconnect } from "@/requests/socket";
 import requestAndProcessMessage from "@/utils/requestAndProcessMessage";
 import Editor from "@/views/Editor";
@@ -65,30 +60,6 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     [state.tabs.items]
   );
 
-  //   const addRealTime = useCallback(() => {
-  //     const newActiveKey = nanoid();
-  //     const newPanes = [...state.tabs.items];
-  //     newPanes.push({
-  //       label: "实时",
-  //       children: (
-  //         <EditorProvider
-  //           editorId={newActiveKey}
-  //           source=".camera">
-  //           <Editor />
-  //         </EditorProvider>
-  //       ),
-  //       key: newActiveKey,
-  //       source: ".camera",
-  //     });
-  //     dispatch({
-  //       type: SET_TABS,
-  //       payload: {
-  //         items: newPanes,
-  //         activeKey: newActiveKey,
-  //       },
-  //     });
-  //   }, [state.tabs.items]);
-
   const providedValue = useMemo(() => {
     return {
       dispatch,
@@ -105,11 +76,11 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  useEffect(() => {
+  const getStyles = () => {
     requestAndProcessMessage(
-      REQUEST_STYLES,
-      STYLES_MESSAGE,
-      null,
+      REQUEST_RECENT,
+      `${RECENT_MESSAGE}styles`,
+      "styles",
       (results) => {
         dispatch({
           type: ADD_STYLES,
@@ -119,12 +90,44 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     );
-    requestAndProcessMessage(REQUEST_RECENT, RECENT_MESSAGE, null, (result) => {
-      dispatch({
-        type: SET_RECENT,
-        payload: result,
-      });
+
+    // // 请求写入
+    // requestAndProcessMessage(
+    //   REQUEST_STYLES,
+    //   STYLES_MESSAGE,
+    //   null,
+    //   (results) => {
+    //     console.log(results);
+    //     const ans = results.map(({ path, name }: any) => ({
+    //       key: name,
+    //       path: path,
+    //       isCustom: false,
+    //     }));
+    //     window.ipcRenderer.send(REQUEST_WRITE_STYLES, ans);
+    //   }
+    // );
+  };
+
+  useEffect(() => {
+    window.ipcRenderer.on("update_styles", () => {
+      console.log("update");
+      getStyles();
     });
+  }, []);
+
+  useEffect(() => {
+    getStyles();
+    requestAndProcessMessage(
+      REQUEST_RECENT,
+      `${RECENT_MESSAGE}recent`,
+      null,
+      (result) => {
+        dispatch({
+          type: SET_RECENT,
+          payload: result,
+        });
+      }
+    );
   }, []);
 
   return (

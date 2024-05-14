@@ -31,8 +31,7 @@ async function loadImagesAsBlobs(
 async function readImagesFromFolder(folderPath: string) {
   try {
     // 读取文件夹中的所有文件和文件夹名称
-    const files = await fs.promises.readdir(folderPath);
-    // 过滤出图片文件
+    const files = await fs.promises.readdir(folderPath, {});
     const imageFiles = files.filter((file) => {
       // 使用 path.extname 获取文件扩展名，并转换为小写进行比较
       // 确保返回值类型为 boolean

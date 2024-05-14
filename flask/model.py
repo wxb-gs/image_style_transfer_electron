@@ -16,7 +16,6 @@ import numpy as np
 import imageio
 from moviepy.editor import VideoFileClip
 
-
 decoder_model_path = './models/decoder_iter_160000.pth.tar'
 vgg_model_path = './models/vgg_normalised.pth'
 DEFAULT_CONTENT='./input/content/avril.jpg'
@@ -271,7 +270,7 @@ class Model:
 
         pbar = tqdm(total = content_video_length)
 
-        output_video_path =os.path.join(DEFAULT_VIDEO_DIR,'_video'+generate_random_filename()+save_ext)
+        output_video_path =os.path.join(DEFAULT_OUTPUT_DIR,'_video'+generate_random_filename()+save_ext)
         writer = imageio.get_writer(output_video_path, mode='I', fps=fps)
 
 
@@ -316,6 +315,7 @@ class Model:
         
         return  os.path.abspath(output_video_path)
 
+    # 处理数据
     def processData(self,data,options):
         if not isinstance(options,dict):
             print('参数错误')
@@ -325,7 +325,6 @@ class Model:
         size = options.get('size',256)
         crop = options.get('crop',False)
         alpha = options.get('alpha',1.0)
-        content_video = options.get('content_video',DEFAULT_VIDEO)
         style_paths = options.get('style_paths',[DEFAULT_STYLE])
         preserve_color = options.get('preserve_color',False)
         #可以对一个content转换为不同风格;也可以对一个content转换为融合的风格
@@ -356,8 +355,6 @@ class Model:
                 
         with Image.open(io.BytesIO(image_data)) as img:
             width, height = img.size  # size是一个包含宽和高的元组
-        ratio = width / height
-        print(height,width)
         size = (height,width)
 
         content_tf = self.test_transform(size,crop)
@@ -376,7 +373,6 @@ class Model:
         output = np.array(output)*255
         output = np.transpose(output, (1,2,0))
         output = np.clip(output, 0, 255).astype(np.uint8)
-        # output = cv2.resize(output, (width,height),interpolation=cv2.INTER_AREA) 
 
         # 将numpy数组转换为PIL图像
         pil_image = Image.fromarray(output)

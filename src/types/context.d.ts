@@ -11,9 +11,15 @@ interface TabItem {
   source?: string;
 }
 
+interface Style {
+  key: string;
+  path: string;
+  isCustom: boolean;
+}
+
 interface State {
   id: string;
-  styles: string[];
+  styles: Style[];
   recent: object[];
   source: [];
   tabs: {
@@ -55,6 +61,7 @@ interface SelectedStyle {
   key: string;
   path: string;
   weight: number;
+  isCustom: boolean;
 }
 
 interface Progress {

@@ -5,9 +5,12 @@ from flask_socketio import SocketIO, emit
 from flask import Flask
 from model import Model
 from threading import Thread
+from demo_edit_art_style import TextStyleTransfer
 
 #上来就加载模型
 useModel = Model()
+textStyleModel = TextStyleTransfer()
+
 app = Flask(__name__)
 
 socketio = SocketIO(app,cors_allowed_origins='*')
@@ -108,5 +111,7 @@ def handle_disconnect():
 
 
 if __name__ == '__main__':
+    _path = textStyleModel.text_trans({})
+    print(_path)
     # 通过添加allow_unsafe_werkzeug=True参数，你可以在生产环境中运行你的Flask-SocketIO应用。
     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

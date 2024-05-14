@@ -1,5 +1,5 @@
+import { ReactNode, useMemo, useState } from "react";
 import EditorContext from "./EditorContext";
-import { useState, useMemo, ReactNode } from "react";
 type Props = {
   children: ReactNode;
   editorId: string;
@@ -19,11 +19,13 @@ const EditorProvider = ({
   );
   const [styles, setStyles] = useState<SelectedStyle[]>([
     {
-      key: "antimonocromatismo",
-      path: "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\styles\\antimonocromatismo.jpg",
+      key: "刷笔笔触",
+      path: "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\styles\\刷笔笔触.jpg.jpg",
       weight: 1,
+      isCustom: false,
     },
   ]);
+
   const [histories, setHistories] = useState<string[]>([]);
   const [progress, setProgress] = useState<Progress>({
     now: 0,
@@ -51,6 +53,7 @@ const EditorProvider = ({
     }),
     [id, source, loading, resImg, styles, histories, resVideo, progress]
   );
+
   return (
     <EditorContext.Provider value={providedValue}>
       {children}

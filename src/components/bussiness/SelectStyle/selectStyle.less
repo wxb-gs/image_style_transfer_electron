@@ -4,6 +4,8 @@
   max-height: 100%;
   overflow: auto;
   display: grid;
+  justify-content: center;
+  align-items: center;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   .active {
@@ -41,8 +43,6 @@
       margin: 10px 0;
       border-radius: 5px;
       position: relative;
-      //   height: 150px;
-      //   width: 150px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -57,7 +57,6 @@
         -webkit-user-select: none; /* Safari */
         -ms-user-select: none; /* IE/Edge */
         user-select: none; /* 其他浏览器 */
-        // mask: linear-gradient(to right, transparent 50%, black 50%);
       }
       .mask {
         background-color: rgba(0, 0, 0, 0.5);
@@ -72,6 +71,22 @@
       }
       .right-slider {
         position: absolute;
+      }
+    }
+  }
+  .style-add {
+    border-radius: 5px;
+    width: 145px;
+    height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      height: 120px;
+      width: 120px;
+      transition: transform 0.3s ease-out;
+      &:hover {
+        transform: scale(1.1);
       }
     }
   }

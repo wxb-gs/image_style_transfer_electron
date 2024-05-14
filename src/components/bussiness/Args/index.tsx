@@ -57,18 +57,18 @@ const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
     children: <BasicSetting />,
     style: panelStyle,
   },
-  {
-    key: "2",
-    label: "自定义风格",
-    children: <CustomSetting />,
-    style: panelStyle,
-  },
-  {
-    key: "3",
-    label: "模型选择",
-    children: <p>{text}</p>,
-    style: panelStyle,
-  },
+  //   {
+  //     key: "2",
+  //     label: "自定义风格",
+  //     children: <CustomSetting />,
+  //     style: panelStyle,
+  //   },
+  //   {
+  //     key: "3",
+  //     label: "模型选择",
+  //     children: <p>{text}</p>,
+  //     style: panelStyle,
+  //   },
 ];
 
 const Args: React.FC = () => {
@@ -85,7 +85,7 @@ const Args: React.FC = () => {
   return (
     <Collapse
       bordered={false}
-      defaultActiveKey={["1", "2", "3"]}
+      defaultActiveKey={["1"]}
       expandIcon={({ isActive }) => (
         <CaretRightOutlined rotate={isActive ? 90 : 0} />
       )}

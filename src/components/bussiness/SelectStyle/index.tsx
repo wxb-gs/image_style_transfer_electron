@@ -1,14 +1,26 @@
+import { REQUEST_WRITE_STYLES } from "@/constants";
 import { useEditorStore } from "@/hooks/useEditorStore";
 import { useStore } from "@/hooks/useStore";
 import { getSafePath } from "@/utils/pathUtils";
-import { Collapse, CollapseProps, Tooltip, theme } from "antd";
+import { CaretRightOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  Collapse,
+  CollapseProps,
+  Dropdown,
+  MenuProps,
+  Tooltip,
+  theme,
+} from "antd";
 import { Resizable } from "re-resizable";
-import { useMemo, useCallback, CSSProperties } from "react";
+import { CSSProperties, useCallback, useMemo } from "react";
+import { ADD_STYLES } from "../../../actions/addStyles";
 import "./selectStyle.less";
-import { CaretRightOutlined } from "@ant-design/icons";
 const DEFAULT_MAX_HEIGHT = 140;
 const DEAULT_MIN_HEIGHT = 2;
+
+// 风格图片
 const StyleImage = ({ name, path, selectedMap, handleClick }: any) => {
+  const { styles: globalStyls, dispatch } = useStore();
   const { styles, setStyles } = useEditorStore();
   const weight = useMemo(() => {
     const style = styles.find(({ key }) => name == key);
@@ -17,6 +29,8 @@ const StyleImage = ({ name, path, selectedMap, handleClick }: any) => {
     }
     return 1;
   }, [styles]);
+
+  // 设置权重
   const setWeight = useCallback(
     (num: number) => {
       const newStyles = [...styles];
@@ -26,51 +40,89 @@ const StyleImage = ({ name, path, selectedMap, handleClick }: any) => {
     },
     [styles]
   );
+  const handleContextMenu = () => {
+    // delete the name from recent.json 的styles中
+    const newGlobalStyles = globalStyls.filter((item) => item.key != name);
+    dispatch({
+      ADD_STYLES,
+      payload: {
+        styles: newGlobalStyles,
+      },
+    });
+    // 请求写入
+    window.ipcRenderer.send(REQUEST_WRITE_STYLES, newGlobalStyles);
+    window.ipcRenderer.send("want_update_styles");
+  };
+  const items: MenuProps["items"] = [
+    {
+      label: "删除",
+      key: "1",
+      icon: <DeleteOutlined />,
+      onClick: handleContextMenu,
+    },
+  ];
+
   return (
-    <div
-      className={["img-container", selectedMap.has(name) ? "active" : ""].join(
-        " "
-      )}
-      key={name}>
-      <p onClick={() => handleClick(name)}>{name} </p>
-      <div className={["style-content"].join(" ")}>
-        <img
-          alt=""
-          src={getSafePath(path)}
-          key={name}
-        />
-        <div
-          className="mask"
-          onClick={() => handleClick(name)}></div>
-        {selectedMap.has(name) && (
-          <Tooltip title={`${(weight * 100).toFixed(0)}%`}>
-            <Resizable
-              className="resize-mask"
-              enable={{ bottom: true }}
-              handleClasses={{ bottom: "my-topBar" }}
-              maxHeight={DEFAULT_MAX_HEIGHT}
-              minHeight={DEAULT_MIN_HEIGHT}
-              onResize={(_e, _d, _ref, _delta) => {
-                const height = _ref.clientHeight;
-                const alpha =
-                  1 - (1.0 * (height - DEAULT_MIN_HEIGHT)) / DEFAULT_MAX_HEIGHT;
-                setWeight(parseFloat(alpha.toFixed(2)));
-              }}
-              defaultSize={{
-                height: (1 - weight) * DEFAULT_MAX_HEIGHT,
-                width: 140,
-              }}></Resizable>
-          </Tooltip>
-        )}
+    <Dropdown
+      trigger={["contextMenu"]}
+      menu={{ items }}>
+      <div
+        className={[
+          "img-container",
+          selectedMap.has(name) ? "active" : "",
+        ].join(" ")}
+        key={name}>
+        <p onClick={() => handleClick(name)}>{name} </p>
+        <div className={["style-content"].join(" ")}>
+          <img
+            alt=""
+            src={getSafePath(path)}
+            key={name}
+          />
+          <div
+            className="mask"
+            onClick={() => handleClick(name)}></div>
+          {selectedMap.has(name) && (
+            <Tooltip title={`${(weight * 100).toFixed(0)}%`}>
+              <Resizable
+                className="resize-mask"
+                enable={{ bottom: true }}
+                handleClasses={{ bottom: "my-topBar" }}
+                maxHeight={DEFAULT_MAX_HEIGHT}
+                minHeight={DEAULT_MIN_HEIGHT}
+                onResize={(_e, _d, _ref, _delta) => {
+                  const height = _ref.clientHeight;
+                  const alpha =
+                    1 -
+                    (1.0 * (height - DEAULT_MIN_HEIGHT)) / DEFAULT_MAX_HEIGHT;
+                  setWeight(parseFloat(alpha.toFixed(2)));
+                }}
+                defaultSize={{
+                  height: (1 - weight) * DEFAULT_MAX_HEIGHT,
+                  width: 140,
+                }}></Resizable>
+            </Tooltip>
+          )}
+        </div>
       </div>
-    </div>
+    </Dropdown>
   );
 };
 
+// 选择风格界面
 const SelectStyle = () => {
-  const { styles } = useStore();
+  const { styles: _styles } = useStore();
   const { token } = theme.useToken();
   const { styles: selectStyles, setStyles: setSelectStyles } = useEditorStore();
+  const styles = useMemo(() => {
+    const arr = _styles.filter((item) => item.isCustom == false);
+    return arr.map((item) => ({ name: item.key, path: item.path }));
+  }, [_styles]);
+  const customStyles = useMemo(() => {
+    console.log("下滑海鲜，");
+    const arr = _styles.filter((item) => item.isCustom == true);
+    return arr.map((item) => ({ name: item.key, path: item.path }));
+  }, [_styles]);
   const selectedMap = useMemo(() => {
     const map = new Map();
     selectStyles.forEach((item) => {
@@ -84,6 +136,32 @@ const SelectStyle = () => {
     borderRadius: token.borderRadiusLG,
     border: "none",
   };
+
+  const addStyle = () => {
+    window.ipcRenderer.send("request_add_style");
+  };
+  const renderCustom = () => (
+    <div className="style-imgs">
+      {customStyles.map(({ name, path }: any) => (
+        <StyleImage
+          name={name}
+          path={path}
+          key={path}
+          selectedMap={selectedMap}
+          handleClick={handleClick}
+        />
+      ))}
+      <div
+        className="style-add"
+        onClick={addStyle}>
+        <img
+          alt=""
+          src="../../../../public/add.png"
+        />
+      </div>
+    </div>
+  );
+
   const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] =
     useCallback(
       (panelStyle) => [
@@ -108,15 +186,15 @@ const SelectStyle = () => {
         {
           key: "2",
           label: "自定义",
-          children: <div></div>,
+          children: renderCustom(),
           style: panelStyle,
         },
       ],
-      [styles, selectedMap]
+      [_styles, styles, customStyles, selectedMap]
     );
 
   const handleClick = (keyName: string) => {
-    const { path }: any = styles.find((item: any) => item.name == keyName);
+    const { path }: any = _styles.find((item: any) => item.key == keyName);
 
     if (!selectedMap.has(keyName)) {
       const item = {
@@ -134,7 +212,7 @@ const SelectStyle = () => {
   return (
     <Collapse
       bordered={false}
-      defaultActiveKey={["1"]}
+      defaultActiveKey={["1", "2"]}
       expandIcon={({ isActive }) => (
         <CaretRightOutlined rotate={isActive ? 90 : 0} />
       )}

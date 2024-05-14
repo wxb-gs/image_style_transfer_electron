@@ -7,7 +7,9 @@ const CLOSE_WINDOW = "close-window";
 const REQUEST_RECENT = "request_recent";
 const OPEN_FILE_DIALOG = "open-file-dialog";
 const REQUEST_WRITE_RECENT = "request_write_recent";
+const REQUEST_WRITE_STYLES = "request_write_styles";
 // Mesage, node to  render
+
 const STYLES_MESSAGE = "image-paths";
 const IMAGE_PATHS_MESSAGE = "image-paths";
 const RECENT_MESSAGE = "recent_message";
@@ -15,6 +17,7 @@ const MAXIMIZE_MESSAGE = "maximize_message";
 const SELECT_FILE_MESSAGE = "select_file_message";
 const ADD_RECENT_MESSAGE = "ADD_recent_message";
 export {
+  REQUEST_WRITE_STYLES,
   ADD_RECENT_MESSAGE,
   REQUEST_WRITE_RECENT,
   SELECT_FILE_MESSAGE,

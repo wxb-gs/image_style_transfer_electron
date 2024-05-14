@@ -11,6 +11,7 @@ import React, { useMemo, useState } from "react";
 import Resource from "../Resource";
 import Setting from "../Setting";
 import "./home.less";
+import ImageTransfer from "../ImageTransfer";
 const { Content, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -39,6 +40,11 @@ const tabInfo = {
     label: TAB_KEYS.RESOURCE,
     cache: true,
     component: Resource,
+  },
+  [TAB_KEYS.IMAGE_TRANSFER]: {
+    label: TAB_KEYS.IMAGE_TRANSFER,
+    cache: false,
+    component: ImageTransfer,
   },
   [TAB_KEYS.SETTING]: {
     label: TAB_KEYS.SETTING,

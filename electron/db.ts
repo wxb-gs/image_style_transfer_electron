@@ -10,7 +10,7 @@ export interface RecentRecord {
 }
 export type Data = {
   recent: RecentRecord[];
-  customStyles: string[];
+  styles: Style[];
 };
 const PATH = path.resolve(__dirname, "../dist-electron/data/recent.json");
 const defaultData = {

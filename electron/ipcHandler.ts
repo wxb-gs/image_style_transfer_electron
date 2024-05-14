@@ -1,5 +1,7 @@
+import { TAB_KEYS } from "@/constants";
+import { LIMIT_IMAGE } from "../src/constants";
 import dayjs from "dayjs";
-import { BrowserWindow, dialog, ipcMain } from "electron";
+import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -14,6 +16,7 @@ import {
   REQUEST_RECENT,
   REQUEST_STYLES,
   REQUEST_WRITE_RECENT,
+  REQUEST_WRITE_STYLES,
   STYLES_MESSAGE,
 } from "../src/constants";
 
@@ -31,20 +34,62 @@ const DATA_PATH =
   "E:\\myAllProjects\\vue\\electron-vite-project\\dist-electron\\data";
 
 function defineIpcHandler(win: BrowserWindow, db: Low<Data>) {
+  // 请求输入内容图片
   ipcMain.on(REQUEST_IMAGES, async () => {
     const imagePaths = await readImagesFromFolder(folderPath);
     win.webContents.send(IMAGE_PATHS_MESSAGE, imagePaths);
   });
 
+  //请求styles文件夹
   ipcMain.on(REQUEST_STYLES, async () => {
     const styleInfo = await getStyleInfo(styleFolderPath);
     win.webContents.send(STYLES_MESSAGE, styleInfo);
   });
+
+  //请求文件夹中的内容，以files消息发送回去
+  ipcMain.on("request_files", async (_e) => {
+    // const relativePath: string = "./flask/input/styles/";
+    // const fileFoldPath = path.resolve("./", relativePath);
+    const fileFoldPath = styleFolderPath;
+    if (path.isAbsolute(fileFoldPath)) {
+      const paths = await readImagesFromFolder(fileFoldPath);
+      win.webContents.send("files_message", paths);
+    }
+  });
+
+  //add Style
+  ipcMain.on("request_add_style", async (_e) => {
+    const file = dialog.showOpenDialogSync({
+      title: "选择文件",
+      properties: ["openFile"],
+      //设置规则
+      filters: [
+        {
+          name: "Image Files or Video",
+          extensions: LIMIT_IMAGE,
+        },
+      ],
+    });
+    if (file) {
+      const absolutePath = path.parse(file[0]);
+      db.data.styles.push({
+        key: absolutePath.name,
+        path: file[0],
+        isCustom: true,
+      });
+      await db.write();
+      win.webContents.send("update_styles");
+    }
+  });
+
+  ipcMain.on("want_update_styles", (_e) => {
+    win.webContents.send("update_styles");
+  });
+
   // 在主进程中监听来自渲染器的消息并显示对话框
   ipcMain.on(OPEN_FILE_DIALOG, async () => {
     const file = dialog.showOpenDialogSync({
       title: "选择文件",
-      //   properties: ['openFile', 'multiSelections'],
       properties: ["openFile"],
       //设置规则
       filters: [
@@ -74,17 +119,72 @@ function defineIpcHandler(win: BrowserWindow, db: Low<Data>) {
       win.webContents.send(RECENT_MESSAGE, db.data.recent);
     }
   });
+
+  // 监听历史记录
+  ipcMain.on("get_trans_histories", async (_e, cur: number) => {
+    const folderPath =
+      "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\output";
+    const files = await fs.promises.readdir(folderPath);
+
+    const fullPaths = files.map((file) => path.join(folderPath, file));
+
+    Promise.all(
+      fullPaths.map((filePath) => {
+        return new Promise((resolve, reject) => {
+          fs.stat(filePath, (err, stats) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            resolve({
+              path: filePath,
+              type: stats.isDirectory() ? "folder" : "file",
+              mtime: stats.mtime,
+            });
+          });
+        });
+      })
+    )
+      .then((filesInfo: any) => {
+        // 按照最后修改时间排序
+        const ans: any = [];
+        filesInfo.sort((a: any, b: any) => b.mtime - a.mtime);
+        // 输出结果
+        filesInfo.forEach((fileInfo: any) => {
+          // 获取文件扩展名
+          const extname = path.extname(fileInfo.path);
+          ans.push({
+            path: fileInfo.path,
+            type: extname.substring(1),
+          });
+        });
+        // [].slice(cur, (cur + 1) * 10);
+        win.webContents.send("send-trans-histories", ans);
+      })
+      .catch((err) => {
+        console.error("Error getting file stats:", err);
+      });
+  });
+
+  ipcMain.on("request_local", (_e, src) => {
+    shell.showItemInFolder(src);
+  });
 }
 
 // lowdb读取相关
 function lowdbHandler(win: BrowserWindow, db: Low<Data>) {
   ipcMain.on(REQUEST_RECENT, async (_e, key = "recent") => {
     const recentData = getValue(db, key);
-    win.webContents.send(RECENT_MESSAGE, recentData);
+    win.webContents.send(RECENT_MESSAGE + key, recentData);
   });
 
   ipcMain.on(REQUEST_WRITE_RECENT, async (_e, content: RecentRecord) => {
     db.data.recent.push(content);
+    db.write();
+  });
+
+  ipcMain.on(REQUEST_WRITE_STYLES, (_e, content: any) => {
+    db.data.styles = content;
     db.write();
   });
 
@@ -171,7 +271,6 @@ function handleVideoPath(win: BrowserWindow) {
         return;
       }
       win.webContents.send("video-buffer", {
-        // videoBuffer: data.toString("base64"),
         videoBuffer: data,
       });
     });

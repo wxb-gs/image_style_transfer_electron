@@ -1,60 +1,54 @@
-import {
-  IMAGE_PATHS_MESSAGE,
-  REQUEST_IMAGES,
-  REQUEST_STYLES,
-  STYLES_MESSAGE,
-} from "@/constants";
-import { sendMessage } from "@/requests/socket";
-import { processResults } from "@/utils/pathUtils";
-import { Button, Image } from "antd";
-import React from "react";
-import { useState, useEffect } from "react";
-import { nanoid } from "nanoid";
+import React, { useState } from "react";
+import Image from "@/components/common/Image";
+import { Pagination, PaginationProps } from "antd";
+import "./imageTransfer.less";
+import { useEffect } from "react";
+import requestAndProcessMessage from "../../utils/requestAndProcessMessage";
+import { getSafePath } from "@/utils/pathUtils";
+import { Image as MyImage } from "antd";
+import { LIMIT_IMAGE } from "@/constants";
+import Video from "@/components/common/Video";
 const ImageTransfer = () => {
-  const [images, setImages] = useState<string[]>([]);
-  const [styles, setStyles] = useState<string[]>([]);
+  const [current, setCurrent] = useState(1);
+  const onChange: PaginationProps["onChange"] = (page) => {
+    console.log(page);
+    setCurrent(page);
+  };
+  const [result, setResult] = useState([]);
+  //   加载
   useEffect(() => {
-    window.ipcRenderer.send(REQUEST_IMAGES);
-    window.ipcRenderer.on(IMAGE_PATHS_MESSAGE, (_event, results) => {
-      const imgs = processResults(results);
-      setImages(imgs);
-    });
-
-    window.ipcRenderer.send(REQUEST_STYLES);
-    window.ipcRenderer.on(STYLES_MESSAGE, (_event, results) =>
-      setStyles(processResults(results))
+    requestAndProcessMessage(
+      "get_trans_histories",
+      "send-trans-histories",
+      null,
+      (result) => {
+        setResult(result);
+      }
     );
   }, []);
-  const handleClick = () => {
-    sendMessage({ id: "123" });
-  };
+
   return (
-    <div>
-      <Button onClick={handleClick}>测试一下</Button>
-      <Image.PreviewGroup
-        preview={{
-          onChange: (current, prev) =>
-            console.log(`current index: ${current}, prev index: ${prev}`),
-        }}>
-        <input type="text" />
-        {images.map((src) => {
-          return (
-            <img
-              alt="12"
-              src={src}
-              key={nanoid()}
-            />
-          );
-        })}
-        <Image
-          width={200}
-          src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
+    <div className="trans-histories">
+      <div className="trans-images">
+        <MyImage.PreviewGroup>
+          {result.map((item: any) =>
+            LIMIT_IMAGE.includes(item.type) ? (
+              <Image
+                src={getSafePath(item.path)}
+                key={item.path}
+              />
+            ) : (
+              <Video src={item.path} />
+            )
+          )}
+        </MyImage.PreviewGroup>
+      </div>
+      <div className="trans-footer">
+        <Pagination
+          defaultCurrent={1}
+          total={4}
         />
-        <Image
-          width={200}
-          src="https://gw.alipayobjects.com/zos/antfincdn/aPkFc8Sj7n/method-draw-image.svg"
-        />
-      </Image.PreviewGroup>
+      </div>
     </div>
   );
 };
