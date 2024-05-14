@@ -42,6 +42,10 @@ interface EditorContexState {
   styles: SelectedStyle[];
   histories: string[];
   resVideo: string | undefined;
+  text: string;
+  startText: boolean;
+  setStartText: Function;
+  setText: Function;
   progress: Progress;
   setProgress: Function;
   setResVideo: Function;

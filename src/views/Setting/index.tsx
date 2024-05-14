@@ -28,7 +28,7 @@ const Setting = () => {
         canvas!.getContext("2d")!.drawImage(video, 0, 0, 300, 150);
         const imageData = canvas!.toDataURL("image/jpeg");
         socket.emit("video_frame", imageData);
-      }, 1000 / 10); // 大约5帧每秒
+      }, 1000 / 5); // 大约5帧每秒
     }
     if (displayCanvas.current) {
       const ctx = displayCanvas.current?.getContext("2d");

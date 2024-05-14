@@ -6,6 +6,7 @@ import KeepAlive, { useKeepaliveRef } from "keepalive-for-react";
 import React, { useMemo, useState } from "react";
 import "./config.less";
 import Args from "@/components/bussiness/Args";
+import TextTransfer from "@/components/bussiness/TextTransfer";
 type Option = {
   label: string;
   cache: boolean;
@@ -18,6 +19,11 @@ const OPTIONS: Option[] = [
     label: "风格选择",
     cache: true,
     component: SelectStyle,
+  },
+  {
+    label: "文本描述风格",
+    cache: true,
+    component: TextTransfer,
   },
   { label: "设置", cache: true, component: Args },
 ];

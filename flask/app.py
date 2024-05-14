@@ -104,6 +104,21 @@ def on_video_frame(data):
     # socketio.start_background_task(target=process_data, data=data)
 
 
+@socketio.on('text-transfer')
+def text_transfer(msg):
+    print(msg)
+    content_path=msg['content_path']
+    style=msg['style']
+    result = textStyleModel.text_trans({
+        'content':content_path,
+        'style':style
+    })
+    emit('transfer-over',{
+        'filePath':result
+    })
+    print(result)
+
+
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected')
@@ -111,7 +126,7 @@ def handle_disconnect():
 
 
 if __name__ == '__main__':
-    _path = textStyleModel.text_trans({})
-    print(_path)
+    # _path = textStyleModel.text_trans({})
+    # print(_path)
     # 通过添加allow_unsafe_werkzeug=True参数，你可以在生产环境中运行你的Flask-SocketIO应用。
     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

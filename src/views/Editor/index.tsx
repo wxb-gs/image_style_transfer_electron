@@ -2,7 +2,12 @@ import ImageEditor from "@/components/bussiness/ImageEditor";
 import VideoEditor from "@/components/bussiness/VideoEditor";
 import { LIMIT_CAMERA, LIMIT_VIDEO, LIMIT_IMAGE } from "@/constants";
 import { useEditorStore } from "@/hooks/useEditorStore";
-import { sendMessage, sendTransfer, socket } from "@/requests/socket";
+import {
+  sendMessage,
+  sendTextMessage,
+  sendTransfer,
+  socket,
+} from "@/requests/socket";
 import { getFileType } from "@/utils/pathUtils";
 import {
   EyeInvisibleOutlined,
@@ -27,6 +32,8 @@ const Editor = () => {
   const {
     source,
     loading,
+    startText,
+    text,
     styles,
     setProgress,
     setResVideo,
@@ -52,15 +59,24 @@ const Editor = () => {
   //本地文件保存后直接处理
   const listener = useCallback(() => {
     console.log("file save");
-    sendMessage({
-      content_paths: [
-        "E:\\myAllProjects\\vue\\electron-vite-project\\dist-electron\\data\\temp\\temp.jpg",
-      ],
-      style_paths: styles.map((item) => item.path),
-      alpha: styles[0].weight,
-      weights: styles.map((item) => item.weight),
-    } as any);
-  }, [styles]);
+    console.log(styles);
+    if (!startText) {
+      sendMessage({
+        content_paths: [
+          "E:\\myAllProjects\\vue\\electron-vite-project\\dist-electron\\data\\temp\\temp.jpg",
+        ],
+        style_paths: styles.map((item) => item.path),
+        alpha: styles[0].weight,
+        weights: styles.map((item) => item.weight),
+      } as any);
+    } else {
+      sendTextMessage({
+        content_path:
+          "E:\\myAllProjects\\vue\\electron-vite-project\\dist-electron\\data\\temp\\temp.jpg",
+        style: text,
+      });
+    }
+  }, [text, startText, styles]);
 
   useEffect(() => {
     isFirst.current = false;
@@ -159,7 +175,6 @@ const Editor = () => {
       messageApi.warning("请选择风格");
       return;
     }
-    console.log("start");
     setLoading(true);
     if (fileType == "image") {
       setTimeout(() => {
@@ -170,7 +185,7 @@ const Editor = () => {
           }
           return state;
         });
-      }, 5000);
+      }, 15000);
       const fn = imageRef.current as any;
       const { imageData, hideLoadingSpinner } = fn({}, true, false);
       hideLoadingSpinner();

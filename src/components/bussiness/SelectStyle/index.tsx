@@ -119,7 +119,6 @@ const SelectStyle = () => {
     return arr.map((item) => ({ name: item.key, path: item.path }));
   }, [_styles]);
   const customStyles = useMemo(() => {
-    console.log("下滑海鲜，");
     const arr = _styles.filter((item) => item.isCustom == true);
     return arr.map((item) => ({ name: item.key, path: item.path }));
   }, [_styles]);

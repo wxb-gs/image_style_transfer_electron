@@ -27,4 +27,16 @@ const sendMessage = (msg: Message) => {
 const sendTransfer = (msg: any) => {
   socket.emit("transfer", msg);
 };
-export { socket, connect, disconnect, sendMessage, sendTransfer };
+
+const sendTextMessage = (msg: any) => {
+  socket.emit("text-transfer", msg);
+};
+
+export {
+  socket,
+  connect,
+  disconnect,
+  sendTextMessage,
+  sendMessage,
+  sendTransfer,
+};

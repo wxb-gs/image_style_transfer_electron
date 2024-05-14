@@ -125,7 +125,7 @@ const Resource = () => {
           className="other"
           onClick={handleRealTime}>
           <ReactSVG src={OtherSvg} />
-          <p>实时</p>
+          <p>其他</p>
         </div>
       </div>
 

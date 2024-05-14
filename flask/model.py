@@ -19,7 +19,7 @@ from moviepy.editor import VideoFileClip
 decoder_model_path = './models/decoder_iter_160000.pth.tar'
 vgg_model_path = './models/vgg_normalised.pth'
 DEFAULT_CONTENT='./input/content/avril.jpg'
-DEFAULT_STYLE='./input/styles/sketch.png'
+DEFAULT_STYLE='./input/styles/铅笔.png'
 DEFAULT_OUTPUT_DIR='./input/output/'
 DEFAULT_VIDEO = './input/content/video.mp4'
 DEFAULT_VIDEO_DIR = './input/video/'

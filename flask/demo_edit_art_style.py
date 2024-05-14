@@ -40,10 +40,10 @@ class TextStyleTransfer:
         self.m_model = StyleTransfer.load_from_checkpoint("models/wikiart_all.ckpt", strict=False).cuda()
 
     def text_trans(self,opt):
-        opt = {
-            'content':'data/content/14.jpg',
-            'style':'van gogh'
-        }
+        # opt = {
+        #     'content':'data/content/14.jpg',
+        #     'style':'van gogh'
+        # }
 
         content= opt['content']
         style = opt['style']
@@ -94,7 +94,7 @@ class TextStyleTransfer:
         # 生成随机文件名并拼接完整的保存路径
         save_path = os.path.join(save_dir, generate_random_filename() + '.jpg')
         im.save(save_path)
-        return save_path
+        return os.path.abspath(save_path)
 
 
     

@@ -20,7 +20,7 @@ const EditorProvider = ({
   const [styles, setStyles] = useState<SelectedStyle[]>([
     {
       key: "刷笔笔触",
-      path: "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\styles\\刷笔笔触.jpg.jpg",
+      path: "E:\\myAllProjects\\vue\\electron-vite-project\\flask\\input\\styles\\刷笔笔触.jpg",
       weight: 1,
       isCustom: false,
     },
@@ -32,6 +32,8 @@ const EditorProvider = ({
     total: 100,
   });
   const [resVideo, setResVideo] = useState();
+  const [text, setText] = useState("");
+  const [startText, setStartText] = useState(false);
   const providedValue: EditorContexState = useMemo(
     () => ({
       editorId: id,
@@ -42,7 +44,10 @@ const EditorProvider = ({
       histories,
       resVideo,
       progress,
+      text,
+      startText,
       setResVideo,
+      setStartText,
       setProgress,
       setHistories,
       setStyles,
@@ -50,8 +55,20 @@ const EditorProvider = ({
       setSource,
       setResImg,
       setLoading,
+      setText,
     }),
-    [id, source, loading, resImg, styles, histories, resVideo, progress]
+    [
+      id,
+      source,
+      loading,
+      resImg,
+      styles,
+      text,
+      histories,
+      resVideo,
+      progress,
+      startText,
+    ]
   );
 
   return (
