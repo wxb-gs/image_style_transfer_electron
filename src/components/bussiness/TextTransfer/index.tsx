@@ -5,14 +5,13 @@ const { TextArea } = Input;
 const authors = ["Van Gogh", "Kandinsky"];
 const { Paragraph } = Typography;
 
-const RecommendTags = authors.map((item) => (
-  //   <Tag
-  //     bordered={false}
-  //     color="error">
-  //     error
-  //   </Tag>
-  <Paragraph copyable>{item}</Paragraph>
-));
+const RecommendTags = (
+  <div className="recommend-tags">
+    {authors.map((item) => (
+      <Paragraph copyable>{item}</Paragraph>
+    ))}
+  </div>
+);
 
 const items: CollapseProps["items"] = [
   {
@@ -23,7 +22,7 @@ const items: CollapseProps["items"] = [
   {
     key: "2",
     label: "其他",
-    children: RecommendTags,
+    children: <div></div>,
   },
 ];
 

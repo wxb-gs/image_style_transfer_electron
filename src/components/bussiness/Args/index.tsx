@@ -33,6 +33,24 @@ const BasicSetting = () => (
         }}
       />
     </p>
+    <p>
+      生成图片格式:
+      <Segmented
+        options={["png", "jpg", "gif"]}
+        onChange={(value) => {
+          console.log(value); // string
+        }}
+      />
+    </p>
+    <p>
+      生成视频格式:
+      <Segmented
+        options={["mp4", "avi"]}
+        onChange={(value) => {
+          console.log(value); // string
+        }}
+      />
+    </p>
   </div>
 );
 
@@ -89,7 +107,7 @@ const Args: React.FC = () => {
       expandIcon={({ isActive }) => (
         <CaretRightOutlined rotate={isActive ? 90 : 0} />
       )}
-      style={{ background: token.colorBgContainer }}
+      style={{ background: token.colorBgContainer, overflow: "hidden" }}
       items={getItems(panelStyle)}
     />
   );

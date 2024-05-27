@@ -44,7 +44,7 @@ const CustomMenu = forwardRef<HTMLDivElement>((props, ref) => {
       ref={ref}>
       <div className="logo">
         <ReactSVG src={svgContent} />
-        图像风格转换应用
+        多风格图像编辑转换工具
       </div>
       <MyDivider />
       <div className="menu">
